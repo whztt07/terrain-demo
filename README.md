@@ -1,5 +1,11 @@
 # large-terrain-demo
 
+Note: lava.png and lava_nh.png are licensed specially, see media/about.txt.
+
+------ Code license 
+
+Copyright 2014 scrawl <scrawl@baseoftrash.de>
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
