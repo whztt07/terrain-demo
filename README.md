@@ -1,6 +1,8 @@
 # large-terrain-demo
 
-Note: lava.png and lava_nh.png are licensed specially, see media/about.txt.
+Note: 
+* lava.png and lava_nh.png are licensed specially, see media/about.txt.
+* demo/sdl4ogre/ was taken from the OpenMW source tree, licensed under GPLv3.
 
 ------ Code license 
 
