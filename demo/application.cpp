@@ -107,9 +107,6 @@ void Application::run()
     factory->setGlobalSetting("fog", "false");
     factory->setGlobalSetting("shadows", "false");
     factory->setGlobalSetting("shadows_pssm", "false");
-    factory->setGlobalSetting("viewproj_fix", "false");
-    factory->setGlobalSetting("render_refraction", "false");
-    factory->setGlobalSetting("render_composite_map", "false");
     factory->setGlobalSetting("num_lights", "1");
 #endif
 
