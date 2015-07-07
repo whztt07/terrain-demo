@@ -17,8 +17,6 @@
 #define NEED_DEPTH 1
 #endif
 
-#define UNDERWATER @shGlobalSettingBool(render_refraction)
-
 #define RENDERCMP @shPropertyBool(render_composite_map)
 
 #define LIGHTING !RENDERCMP
@@ -127,10 +125,6 @@
 
     // ----------------------------------- FRAGMENT ------------------------------------------
 
-#if UNDERWATER
-    #include "underwater.h"
-#endif
-
     SH_BEGIN_PROGRAM
     
     
@@ -183,12 +177,8 @@ shUniform(float4x4, worldView) @shAutoConstant(worldView, worldview_matrix)
 #endif
 #endif
 
-#if (UNDERWATER) || (FOG)
+#if FOG
         shUniform(float4x4, worldMatrix) @shAutoConstant(worldMatrix, world_matrix)
-#endif
-
-#if UNDERWATER
-        shUniform(float, waterLevel) @shSharedParameter(waterLevel)
 #endif
 
 
@@ -231,10 +221,6 @@ shUniform(float4, cameraPos) @shAutoConstant(cameraPos, camera_position)
         #endif
 #endif
 
-#endif
-
-#if UNDERWATER
-        float3 waterEyePos = intercept(worldPos, cameraPos.xyz - worldPos, float3(0,0,1), waterLevel);
 #endif
 
 #if !IS_FIRST_PASS
@@ -375,11 +361,7 @@ albedo = shLerp(albedo, diffuseTex, blendValues@shPropertyString(blendmap_compon
 #if FOG
         float fogValue = shSaturate((depth - fogParams.y) * fogParams.w);
         
-        #if UNDERWATER
-        shOutputColour(0).xyz = shLerp (shOutputColour(0).xyz, UNDERWATER_COLOUR, shSaturate(length(waterEyePos-worldPos) / VISIBILITY));
-        #else
         shOutputColour(0).xyz = shLerp (shOutputColour(0).xyz, fogColour, fogValue);
-        #endif
 #endif
 
         // prevent negative colour output (for example with negative lights)
