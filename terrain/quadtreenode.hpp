@@ -130,7 +130,7 @@ namespace Terrain
         /// Create a chunk for this node from the given data.
         void load (const LoadResponseData& data);
         void unload(bool recursive=false);
-        void loadLayers (const LayerCollection& collection);
+        void loadLayers ();
         /// This is recursive! Call it once on the root node after all leafs have loaded layers.
         void loadMaterials();
 

@@ -111,7 +111,6 @@ void Application::run()
     // Create the terrain
     Terrain::TerrainStorage* storage = new Terrain::TerrainStorage();
     mTerrain = new Terrain::World(mSceneMgr, storage, 1, true, true, Terrain::Align_XZ, 1, 128);
-    mTerrain->syncLoad();
 
     // Start the rendering loop
     mRoot->addFrameListener(this);

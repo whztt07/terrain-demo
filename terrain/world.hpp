@@ -26,7 +26,7 @@ namespace Terrain
      *        Cracks at LOD transitions are avoided using stitching.
      * @note  Multiple cameras are not supported yet
      */
-    class World : public Ogre::WorkQueue::RequestHandler, public Ogre::WorkQueue::ResponseHandler
+    class World
     {
     public:
         /// @note takes ownership of \a storage
@@ -85,16 +85,7 @@ namespace Terrain
 
         Alignment getAlign() { return mAlign; }
 
-        /// Wait until all background loading is complete.
-        void syncLoad();
-
     private:
-        // Called from a background worker thread
-        Ogre::WorkQueue::Response* handleRequest(const Ogre::WorkQueue::Request* req, const Ogre::WorkQueue* srcQ);
-        // Called from the main thread
-        void handleResponse(const Ogre::WorkQueue::Response* res, const Ogre::WorkQueue* srcQ);
-        Ogre::uint16 mWorkQueueChannel;
-
         bool mDistantLand;
         bool mShaders;
         bool mShadows;
@@ -108,9 +99,6 @@ namespace Terrain
 
         int mVisibilityFlags;
 
-        /// The number of chunks currently loading in a background thread. If 0, we have finished loading!
-        int mChunksLoading;
-
         Ogre::SceneManager* mSceneMgr;
         Ogre::SceneManager* mCompositeMapSceneMgr;
 
@@ -122,19 +110,14 @@ namespace Terrain
         /// Maximum size of a terrain batch along one side (in cell units)
         float mMaxBatchSize;
 
-        void buildQuadTree(QuadTreeNode* node, std::vector<QuadTreeNode*>& leafs);
+        void buildQuadTree(QuadTreeNode* node);
 
         BufferCache mCache;
-
-        // Are layers for leaf nodes loaded? This is done once at startup (but in a background thread)
-        bool mLayerLoadPending;
 
     public:
         // ----INTERNAL----
         Ogre::SceneManager* getCompositeMapSceneManager() { return mCompositeMapSceneMgr; }
         BufferCache& getBufferCache() { return mCache; }
-
-        bool areLayersLoaded() { return !mLayerLoadPending; }
 
         // Delete all quads
         void clearCompositeMapSceneManager();
@@ -145,20 +128,9 @@ namespace Terrain
         void convertPosition (Ogre::Vector3& pos);
         void convertBounds (Ogre::AxisAlignedBox& bounds);
 
-        // Adds a WorkQueue request to load a chunk for this node in the background.
-        void queueLoad (QuadTreeNode* node);
-
     private:
         Ogre::RenderTarget* mCompositeMapRenderTarget;
         Ogre::TexturePtr mCompositeMapRenderTexture;
-    };
-
-    struct LoadRequestData
-    {
-        QuadTreeNode* mNode;
-
-        friend std::ostream& operator<<(std::ostream& o, const LoadRequestData& r)
-        { return o; }
     };
 
     struct LoadResponseData
@@ -168,15 +140,6 @@ namespace Terrain
         std::vector<Ogre::uint8> mColours;
 
         friend std::ostream& operator<<(std::ostream& o, const LoadResponseData& r)
-        { return o; }
-    };
-
-    struct LayersRequestData
-    {
-        std::vector<QuadTreeNode*> mNodes;
-        bool mPack;
-
-        friend std::ostream& operator<<(std::ostream& o, const LayersRequestData& r)
         { return o; }
     };
 

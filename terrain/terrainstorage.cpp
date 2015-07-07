@@ -150,20 +150,6 @@ void TerrainStorage::getBlendmaps (float chunkSize, const Ogre::Vector2& chunkCe
     layerList.push_back(layer);
 }
 
-void TerrainStorage::getBlendmaps (const std::vector<Terrain::QuadTreeNode*>& nodes, std::vector<Terrain::LayerCollection>& out, bool pack)
-{
-    for (std::vector<Terrain::QuadTreeNode*>::const_iterator it = nodes.begin(); it != nodes.end(); ++it)
-    {
-        out.push_back(Terrain::LayerCollection());
-        out.back().mTarget = *it;
-        Terrain::LayerInfo layer;
-        layer.mDiffuseMap = "lava.png";
-        layer.mParallax = false;
-        layer.mSpecular = false;
-        out.back().mLayers.push_back(layer);
-    }
-}
-
 }
 
 
