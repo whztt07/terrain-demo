@@ -19,8 +19,6 @@
 
 #define UNDERWATER @shGlobalSettingBool(render_refraction)
 
-#define VIEWPROJ_FIX @shGlobalSettingBool(viewproj_fix)
-
 #define RENDERCMP @shPropertyBool(render_composite_map)
 
 #define LIGHTING !RENDERCMP
@@ -29,8 +27,6 @@
 
 #define NORMAL_MAP @shPropertyBool(normal_map_enabled)
 #define PARALLAX @shPropertyBool(parallax_enabled)
-
-#define VERTEX_LIGHTING (!NORMAL_MAP)
 
 #define PARALLAX_SCALE 0.04
 #define PARALLAX_BIAS -0.02
@@ -48,12 +44,7 @@
 
 #if LIGHTING
 @shAllocatePassthrough(3, normalPassthrough)
-#if VERTEX_LIGHTING
-@shAllocatePassthrough(3, lightResult)
-@shAllocatePassthrough(3, directionalResult)
-#else
 @shAllocatePassthrough(3, colourPassthrough)
-#endif
 
 #if SHADOWS
 @shAllocatePassthrough(4, lightSpacePos0)
@@ -72,23 +63,12 @@
     SH_BEGIN_PROGRAM
         shUniform(float4x4, worldMatrix) @shAutoConstant(worldMatrix, world_matrix)
         shUniform(float4x4, viewProjMatrix) @shAutoConstant(viewProjMatrix, viewproj_matrix)
-        
-#if VIEWPROJ_FIX
-        shUniform(float4, vpRow2Fix) @shSharedParameter(vpRow2Fix, vpRow2Fix)
-#endif
-        
+
         shVertexInput(float2, uv0)
 
 #if LIGHTING
         shNormalInput(float4)
         shColourInput(float4)
-
-#if VERTEX_LIGHTING
-        shUniform(float4, lightPosition[@shGlobalSettingString(num_lights)]) @shAutoConstant(lightPosition, light_position_object_space_array, @shGlobalSettingString(num_lights))
-        shUniform(float4, lightDiffuse[@shGlobalSettingString(num_lights)]) @shAutoConstant(lightDiffuse, light_diffuse_colour_array, @shGlobalSettingString(num_lights))
-        shUniform(float4, lightAttenuation[@shGlobalSettingString(num_lights)]) @shAutoConstant(lightAttenuation, light_attenuation_array, @shGlobalSettingString(num_lights))
-        shUniform(float4, lightAmbient)                    @shAutoConstant(lightAmbient, ambient_light_colour)
-#endif
 
 #if SHADOWS
         shUniform(float4x4, texViewProjMatrix0) @shAutoConstant(texViewProjMatrix0, texture_viewproj_matrix)
@@ -112,25 +92,7 @@
         shOutputPosition = shMatrixMult(viewProjMatrix, worldPos);
         
 #if NEED_DEPTH
-#if VIEWPROJ_FIX
-        float4x4 vpFixed = viewProjMatrix;
-#if !SH_GLSL
-        vpFixed[2] = vpRow2Fix;
-#else
-        vpFixed[0][2] = vpRow2Fix.x;
-        vpFixed[1][2] = vpRow2Fix.y;
-        vpFixed[2][2] = vpRow2Fix.z;
-        vpFixed[3][2] = vpRow2Fix.w;
-#endif
-
-        float4x4 fixedWVP = shMatrixMult(vpFixed, worldMatrix);
-
-        float depth = shMatrixMult(fixedWVP, shInputPosition).z;
-        @shPassthroughAssign(depth, depth);
-#else
         @shPassthroughAssign(depth, shOutputPosition.z);
-#endif
-
 #endif
 
         @shPassthroughAssign(UV, uv0);
@@ -139,8 +101,6 @@
 
 #if LIGHTING
         @shPassthroughAssign(normalPassthrough, normal.xyz);
-#endif
-#if LIGHTING && !VERTEX_LIGHTING
         @shPassthroughAssign(colourPassthrough, colour.xyz);
 #endif
 
@@ -158,35 +118,6 @@
         lightSpacePos = shMatrixMult(texViewProjMatrix@shIterator, wPos);
         @shPassthroughAssign(lightSpacePos@shIterator, lightSpacePos);
     @shEndForeach
-#endif
-
-
-#if VERTEX_LIGHTING
-        // Lighting
-        float3 lightDir;
-        float d;
-        float3 lightResult = float3(0,0,0);
-        float3 directionalResult = float3(0,0,0);
-        @shForeach(@shGlobalSettingString(num_lights))
-            lightDir = lightPosition[@shIterator].xyz - (shInputPosition.xyz * lightPosition[@shIterator].w);
-            d = length(lightDir);
-            lightDir = normalize(lightDir);
-
-
-            lightResult.xyz += lightDiffuse[@shIterator].xyz
-                    * shSaturate(1.0 / ((lightAttenuation[@shIterator].y) + (lightAttenuation[@shIterator].z * d) + (lightAttenuation[@shIterator].w * d * d)))
-                    * max(dot(normal.xyz, lightDir), 0);
-
-#if @shIterator == 0
-            directionalResult = lightResult.xyz;
-#endif
-        @shEndForeach
-        lightResult.xyz += lightAmbient.xyz;
-        lightResult.xyz *= colour.xyz;
-        directionalResult.xyz *= colour.xyz;
-
-        @shPassthroughAssign(lightResult, lightResult);
-        @shPassthroughAssign(directionalResult, directionalResult);
 #endif
 
 #endif
@@ -229,13 +160,11 @@
 
 #if LIGHTING
 
-#if !VERTEX_LIGHTING
 shUniform(float4, lightPosition[@shGlobalSettingString(num_lights)]) @shAutoConstant(lightPosition, light_position_array, @shGlobalSettingString(num_lights))
 shUniform(float4, lightDiffuse[@shGlobalSettingString(num_lights)]) @shAutoConstant(lightDiffuse, light_diffuse_colour_array, @shGlobalSettingString(num_lights))
 shUniform(float4, lightAttenuation[@shGlobalSettingString(num_lights)]) @shAutoConstant(lightAttenuation, light_attenuation_array, @shGlobalSettingString(num_lights))
 shUniform(float4, lightAmbient)                    @shAutoConstant(lightAmbient, ambient_light_colour)
 shUniform(float4x4, worldView) @shAutoConstant(worldView, worldview_matrix)
-#endif
 
 #if SHADOWS
         shSampler2D(shadowMap0)
@@ -286,7 +215,7 @@ shUniform(float4, cameraPos) @shAutoConstant(cameraPos, camera_position)
         float3 normal = @shPassthroughReceive(normalPassthrough);
 #endif
 
-#if LIGHTING && !VERTEX_LIGHTING
+#if LIGHTING
 
 #if NORMAL_MAP
         // derive the tangent space basis
@@ -382,13 +311,6 @@ albedo = shLerp(albedo, diffuseTex, blendValues@shPropertyString(blendmap_compon
 #endif
 
 #if LIGHTING
-
-#if VERTEX_LIGHTING
-        // Lighting 
-        float3 lightResult = @shPassthroughReceive(lightResult);
-        float3 directionalResult = @shPassthroughReceive(directionalResult);
-#else
-
 #if NORMAL_MAP
         normal = normalize (shMatrixMult( transpose(tbn), TSnormal ));
 #endif
@@ -412,7 +334,6 @@ albedo = shLerp(albedo, diffuseTex, blendValues@shPropertyString(blendmap_compon
         lightResult.xyz += lightAmbient.xyz;
         lightResult.xyz *= colour.xyz;
         directionalResult.xyz *= colour.xyz;
-#endif
 
         // shadows only for the first (directional) light
 #if SHADOWS
