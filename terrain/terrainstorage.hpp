@@ -10,7 +10,10 @@ namespace Terrain
 
 class TerrainStorage : public Terrain::Storage
 {
+public:
+    TerrainStorage();
 
+protected:
     /// Get bounds of the whole terrain in cell units
     virtual void getBounds(float& minX, float& maxX, float& minY, float& maxY);
 
@@ -63,6 +66,21 @@ class TerrainStorage : public Terrain::Storage
     /// Get the number of vertices on one side for each cell. Should be (power of two)+1
     virtual int getCellVertices();
 
+
+    // ---------------------------------------------------------------------------------
+
+    /// Get the size of heightmap for the whole terrain. This should be a power of two.
+    virtual int getHeightmapSize() = 0;
+
+    /// Fill the heightmap into an array of size heightmapSize * heightmapSize.
+    virtual void loadHeightmap(float* array) = 0;
+
+private:
+    void ensureHeightmapLoaded();
+
+    std::vector<float> mHeightmap;
+    float mMinHeight;
+    float mMaxHeight;
 };
 
 }

@@ -15,6 +15,32 @@
 #include "../terrain/world.hpp"
 #include "../terrain/terrainstorage.hpp"
 
+class MyTerrainStorage : public Terrain::TerrainStorage
+{
+public:
+    MyTerrainStorage()
+    {
+        for (int i=0; i<512; ++i)
+            for (int j=0; j<512; ++j)
+                mHeightmap[i][j] = std::sin(j/50.f) * 200 + std::cos(i/50.f) * 100;
+    }
+
+    virtual int getHeightmapSize()
+    {
+        return 512;
+    }
+
+    virtual void loadHeightmap(float* array)
+    {
+        memcpy(array, mHeightmap, 512*512*sizeof(float));
+    }
+
+
+private:
+    float mHeightmap[512][512];
+};
+
+
 Application::Application()
     : mInputWrapper(NULL)
     , mRoot(NULL)
@@ -109,7 +135,7 @@ void Application::run()
     mCamera->setPosition(0,400,0);
 
     // Create the terrain
-    Terrain::TerrainStorage* storage = new Terrain::TerrainStorage();
+    MyTerrainStorage* storage = new MyTerrainStorage();
     mTerrain = new Terrain::World(mSceneMgr, storage, 1, true, true, Terrain::Align_XZ, 1, 128);
 
     // Start the rendering loop
