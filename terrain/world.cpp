@@ -74,12 +74,6 @@ namespace Terrain
         , mCache(storage->getCellVertices())
         , mLayerLoadPending(true)
     {
-#if TERRAIN_USE_SHADER == 0
-        if (mShaders)
-            std::cerr << "Compiled Terrain without shader support, disabling..." << std::endl;
-        mShaders = false;
-#endif
-
         mCompositeMapSceneMgr = Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC);
 
         /// \todo make composite map size configurable

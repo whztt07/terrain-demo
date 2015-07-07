@@ -9,10 +9,8 @@
 #include "sdl4ogre/sdlwindowhelper.hpp"
 #include "sdl4ogre/sdlinputwrapper.hpp"
 
-#if TERRAIN_USE_SHADER
 #include <extern/shiny/Main/Factory.hpp>
 #include <extern/shiny/Platforms/Ogre/OgrePlatform.hpp>
-#endif
 
 #include "../terrain/world.hpp"
 #include "../terrain/terrainstorage.hpp"
@@ -99,7 +97,6 @@ void Application::run()
     Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
 
     // Create material system
-#if TERRAIN_USE_SHADER
     sh::OgrePlatform* platform = new sh::OgrePlatform("General", "../media");
     sh::Factory* factory = new sh::Factory(platform);
     factory->setCurrentLanguage(sh::Language_GLSL);
@@ -108,7 +105,6 @@ void Application::run()
     factory->setGlobalSetting("shadows", "false");
     factory->setGlobalSetting("shadows_pssm", "false");
     factory->setGlobalSetting("num_lights", "1");
-#endif
 
     mCamera->setPosition(0,400,0);
 
@@ -124,9 +120,7 @@ void Application::run()
     // For the sake of simplicity, delete everything here.
     // Not very exception friendly, of course, so don't do this at home kids ;)
     delete mTerrain;
-#if TERRAIN_USE_SHADER
     delete factory;
-#endif
 
     mRoot->removeFrameListener(this);
     OGRE_DELETE mRoot;

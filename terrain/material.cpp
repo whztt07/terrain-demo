@@ -6,9 +6,7 @@
 
 #include <boost/functional/hash.hpp>
 
-#if TERRAIN_USE_SHADER
 #include <extern/shiny/Main/Factory.hpp>
-#endif
 
 namespace
 {
@@ -70,9 +68,7 @@ namespace Terrain
         assert(!renderCompositeMap || !displayCompositeMap);
         if (!mat.isNull())
         {
-#if TERRAIN_USE_SHADER
             sh::Factory::getInstance().destroyMaterialInstance(mat->getName());
-#endif
             Ogre::MaterialManager::getSingleton().remove(mat->getName());
         }
 
@@ -152,7 +148,6 @@ namespace Terrain
 
             return mat;
         }
-#if TERRAIN_USE_SHADER
         else
         {
             sh::MaterialInstance* material = sh::Factory::getInstance().createMaterialInstance (name.str());
@@ -352,7 +347,6 @@ namespace Terrain
                 }
             }
         }
-#endif
         return Ogre::MaterialManager::getSingleton().getByName(name.str());
     }
 

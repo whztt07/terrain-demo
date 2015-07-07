@@ -67,9 +67,7 @@ namespace Terrain
 
     Chunk::~Chunk()
     {
-#if TERRAIN_USE_SHADER
         sh::Factory::getInstance().destroyMaterialInstance(mMaterial->getName());
-#endif
         Ogre::MaterialManager::getSingleton().remove(mMaterial->getName());
 
         OGRE_DELETE mVertexData;

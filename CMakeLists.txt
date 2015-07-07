@@ -37,14 +37,6 @@ include_directories(.)
 add_subdirectory (extern/shiny)
 list(APPEND LIBS ${SHINY_LIBRARIES})
 
-option(TERRAIN_USE_SHADER "Enable terrain shaders (requires shiny library and the shader files in ../media)" TRUE)
-
-if (${TERRAIN_USE_SHADER})
-    add_definitions(-DTERRAIN_USE_SHADER=1)
-else()
-    add_definitions(-DTERRAIN_USE_SHADER=0)
-endif()
-
 add_subdirectory (terrain)
 list(APPEND LIBS "large-terrain")
 
