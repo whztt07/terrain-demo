@@ -5,6 +5,9 @@
 
 #include "Simplex.hpp"
 
+namespace Terrain
+{
+
 Terrain::LayerInfo TerrainStorage::getDefaultLayer()
 {
     Terrain::LayerInfo info;
@@ -161,5 +164,6 @@ void TerrainStorage::getBlendmaps (const std::vector<Terrain::QuadTreeNode*>& no
     }
 }
 
+}
 
 

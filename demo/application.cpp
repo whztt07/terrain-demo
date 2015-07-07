@@ -109,7 +109,7 @@ void Application::run()
     mCamera->setPosition(0,400,0);
 
     // Create the terrain
-    TerrainStorage* storage = new TerrainStorage();
+    Terrain::TerrainStorage* storage = new Terrain::TerrainStorage();
     mTerrain = new Terrain::World(mSceneMgr, storage, 1, true, true, Terrain::Align_XZ, 1, 128);
     mTerrain->syncLoad();
 

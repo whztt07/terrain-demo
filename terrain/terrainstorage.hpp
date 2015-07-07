@@ -1,7 +1,12 @@
 #ifndef LTMDEMO_STORAGE_HPP
 #define LTMDEMO_STORAGE_HPP
 
+#include <vector>
+
 #include "../terrain/storage.hpp"
+
+namespace Terrain
+{
 
 class TerrainStorage : public Terrain::Storage
 {
@@ -71,5 +76,7 @@ class TerrainStorage : public Terrain::Storage
     virtual int getCellVertices();
 
 };
+
+}
 
 #endif
