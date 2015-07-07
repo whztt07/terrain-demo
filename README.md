@@ -1,4 +1,4 @@
-# large-terrain-demo
+# terrain-demo
 
 Note: 
 * lava.png and lava_nh.png are licensed specially, see media/about.txt.
