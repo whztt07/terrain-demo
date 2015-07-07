@@ -4,6 +4,8 @@ set(SOURCE_FILES
     chunk.cpp
     material.cpp
     storage.cpp
+    terrainstorage.cpp
+    Simplex.cpp
     defs.hpp
     buffercache.cpp
 )

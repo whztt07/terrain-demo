@@ -15,7 +15,7 @@
 #endif
 
 #include "../terrain/world.hpp"
-#include "terrainstorage.hpp"
+#include "../terrain/terrainstorage.hpp"
 
 Application::Application()
     : mInputWrapper(NULL)
