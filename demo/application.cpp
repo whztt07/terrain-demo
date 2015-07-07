@@ -124,10 +124,9 @@ void Application::run()
 
     // Create material system
     sh::OgrePlatform* platform = new sh::OgrePlatform("General", "../media");
-    sh::Factory* factory = new sh::Factory(platform);
+    std::auto_ptr<sh::Factory> factory (new sh::Factory(platform));
     factory->setCurrentLanguage(sh::Language_GLSL);
     factory->loadAllFiles();
-    factory->setGlobalSetting("fog", "false");
     factory->setGlobalSetting("shadows", "false");
     factory->setGlobalSetting("shadows_pssm", "false");
     factory->setGlobalSetting("num_lights", "1");
@@ -142,10 +141,7 @@ void Application::run()
     mRoot->addFrameListener(this);
     mRoot->startRendering();
 
-    // For the sake of simplicity, delete everything here.
-    // Not very exception friendly, of course, so don't do this at home kids ;)
     delete mTerrain;
-    delete factory;
 
     mRoot->removeFrameListener(this);
     OGRE_DELETE mRoot;

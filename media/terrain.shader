@@ -2,7 +2,7 @@
 
 #define IS_FIRST_PASS (@shPropertyString(pass_index) == 0)
 
-#define FOG (@shGlobalSettingBool(fog) && !@shPropertyBool(render_composite_map))
+#define FOG !@shPropertyBool(render_composite_map)
 
 #define SHADOWS_PSSM @shGlobalSettingBool(shadows_pssm)
 #define SHADOWS @shGlobalSettingBool(shadows)
@@ -20,6 +20,8 @@
 #define RENDERCMP @shPropertyBool(render_composite_map)
 
 #define LIGHTING !RENDERCMP
+
+#define NUM_LIGHTS @shGlobalSettingString(num_lights)
 
 #define COMPOSITE_MAP @shPropertyBool(display_composite_map)
 
@@ -154,9 +156,9 @@
 
 #if LIGHTING
 
-shUniform(float4, lightPosition[@shGlobalSettingString(num_lights)]) @shAutoConstant(lightPosition, light_position_array, @shGlobalSettingString(num_lights))
-shUniform(float4, lightDiffuse[@shGlobalSettingString(num_lights)]) @shAutoConstant(lightDiffuse, light_diffuse_colour_array, @shGlobalSettingString(num_lights))
-shUniform(float4, lightAttenuation[@shGlobalSettingString(num_lights)]) @shAutoConstant(lightAttenuation, light_attenuation_array, @shGlobalSettingString(num_lights))
+shUniform(float4, lightPosition[NUM_LIGHTS]) @shAutoConstant(lightPosition, light_position_array, NUM_LIGHTS)
+shUniform(float4, lightDiffuse[NUM_LIGHTS]) @shAutoConstant(lightDiffuse, light_diffuse_colour_array, NUM_LIGHTS)
+shUniform(float4, lightAttenuation[NUM_LIGHTS]) @shAutoConstant(lightAttenuation, light_attenuation_array, NUM_LIGHTS)
 shUniform(float4, lightAmbient)                    @shAutoConstant(lightAmbient, ambient_light_colour)
 shUniform(float4x4, worldView) @shAutoConstant(worldView, worldview_matrix)
 
