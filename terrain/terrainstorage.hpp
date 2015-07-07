@@ -72,6 +72,9 @@ protected:
     /// Get the size of heightmap for the whole terrain. This should be a power of two.
     virtual int getHeightmapSize() = 0;
 
+    /// Get the size of the whole terrain in world units.
+    virtual int getWorldSize() = 0;
+
     /// Fill the heightmap into an array of size heightmapSize * heightmapSize.
     virtual void loadHeightmap(float* array) = 0;
 

@@ -30,7 +30,24 @@ int TerrainStorage::getCellVertices()
 
 float TerrainStorage::getHeightAt(const Ogre::Vector3 &worldPos)
 {
-    return 0;
+    Ogre::Vector3 normalizedPos = worldPos / getWorldSize();
+    normalizedPos.y *= -1; // FIXME: ???
+    normalizedPos += 0.5; // -1 .. 1
+
+    int hmapSize = getHeightmapSize();
+
+    Ogre::Vector3 heightmapPos = normalizedPos * hmapSize;
+    heightmapPos *= (hmapSize / static_cast<float>(hmapSize+1));
+
+    int x = static_cast<int>(heightmapPos.x);
+    int y = static_cast<int>(heightmapPos.y);
+
+    x = std::max(0, std::min(hmapSize-1, x));
+    y = std::max(0, std::min(hmapSize-1, y));
+
+    return mHeightmap[y * hmapSize + x];
+
+    // TODO: sample 4 heights, build a triangle and interpolate
 }
 
 TerrainStorage::TerrainStorage()
@@ -126,7 +143,7 @@ void TerrainStorage::fillVertexBuffers (int lodLevel, float size, const Ogre::Ve
 
             positions[x*numVerts*3 + y*3] = ((x/float(numVerts-1)-0.5) * size * getCellWorldSize());
             positions[x*numVerts*3 + y*3 + 1] = ((y/float(numVerts-1)-0.5) * size * getCellWorldSize());
-            positions[x*numVerts*3 + y*3 + 2] = mHeightmap[inX*heightmapSize + inY];
+            positions[x*numVerts*3 + y*3 + 2] = mHeightmap[inY*heightmapSize + inX];
 
             // Adjust for wanted alignment
             convertPosition(align, positions[x*numVerts*3 + y*3], positions[x*numVerts*3 + y*3 + 1], positions[x*numVerts*3 + y*3 + 2]);

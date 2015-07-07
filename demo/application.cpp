@@ -2,8 +2,8 @@
 
 #include <OgreRoot.h>
 #include <OgreCamera.h>
+#include <OgreEntity.h>
 
-#include <OgreResourceBackgroundQueue.h>
 #include <OgreTimer.h>
 
 #include "sdl4ogre/sdlwindowhelper.hpp"
@@ -28,6 +28,11 @@ public:
     virtual int getHeightmapSize()
     {
         return 512;
+    }
+
+    virtual int getWorldSize()
+    {
+        return getHeightmapSize() * 10;
     }
 
     virtual void loadHeightmap(float* array)
@@ -115,6 +120,8 @@ void Application::run()
     mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
     mSceneMgr->setAmbientLight(Ogre::ColourValue(1,1,1,1));
     mCamera = mSceneMgr->createCamera("");
+    mCamera->setNearClipDistance(0.1);
+    mCamera->setFarClipDistance(10000);
     Ogre::Viewport* vp = mOgreWindow->addViewport(mCamera);
     vp->setBackgroundColour(Ogre::ColourValue(0.1,0.1,0.1,1.0));
 
@@ -137,11 +144,28 @@ void Application::run()
     MyTerrainStorage* storage = new MyTerrainStorage();
     mTerrain = new Terrain::World(mSceneMgr, storage, 1, true, true, Terrain::Align_XZ, 1, 128);
 
+    // Add entities onto the terrain at some random positions
+    for (int i=0; i<100; ++i)
+    {
+        float x = (std::rand() / static_cast<float>(RAND_MAX) - 0.5) * storage->getWorldSize();
+        float y = (std::rand() / static_cast<float>(RAND_MAX) - 0.5) * storage->getWorldSize();
+
+        float height = mTerrain->getHeightAt(Ogre::Vector3(x, y, 0));
+
+        Ogre::Entity* cubeEnt = mSceneMgr->createEntity(Ogre::SceneManager::PT_CUBE);
+        cubeEnt->setMaterialName("BaseWhite");
+        Ogre::SceneNode* sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(x, height, y));
+        sceneNode->setScale(Ogre::Vector3(0.01, 0.01, 0.01));
+        sceneNode->attachObject(cubeEnt);
+    }
+
     // Start the rendering loop
     mRoot->addFrameListener(this);
     mRoot->startRendering();
 
     delete mTerrain;
+
+    factory.reset();
 
     mRoot->removeFrameListener(this);
     OGRE_DELETE mRoot;
