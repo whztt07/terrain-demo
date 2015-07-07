@@ -79,7 +79,7 @@ void Application::run()
 
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-    mInputWrapper = new SFO::InputWrapper(mSDLWindow, mOgreWindow, true);
+    mInputWrapper = new SFO::InputWrapper(mSDLWindow, mOgreWindow, false);
     mInputWrapper->setWindowEventCallback(this);
     mInputWrapper->setMouseEventCallback(this);
     mInputWrapper->setKeyboardEventCallback(this);
