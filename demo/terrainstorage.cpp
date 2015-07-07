@@ -15,6 +15,16 @@ Terrain::LayerInfo TerrainStorage::getDefaultLayer()
     return info;
 }
 
+float TerrainStorage::getCellWorldSize()
+{
+    return 160;
+}
+
+int TerrainStorage::getCellVertices()
+{
+    return 17;
+}
+
 float TerrainStorage::getHeightAt(const Ogre::Vector3 &worldPos)
 {
     return 0;
@@ -22,10 +32,10 @@ float TerrainStorage::getHeightAt(const Ogre::Vector3 &worldPos)
 
 void TerrainStorage::getBounds(float& minX, float& maxX, float& minY, float& maxY)
 {
-    minX = -64;
-    maxX = 64;
-    minY = -64;
-    maxY = 64;
+    minX = -16;
+    maxX = 16;
+    minY = -16;
+    maxY = 16;
 }
 
 bool TerrainStorage::getMinMaxHeights (float size, const Ogre::Vector2& center, float& min, float& max)

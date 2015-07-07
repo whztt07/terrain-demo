@@ -65,10 +65,10 @@ class TerrainStorage : public Terrain::Storage
     virtual Terrain::LayerInfo getDefaultLayer();
 
     /// Get the transformation factor for mapping cell units to world units.
-    virtual float getCellWorldSize() { return 128; }
+    virtual float getCellWorldSize();
 
     /// Get the number of vertices on one side for each cell. Should be (power of two)+1
-    virtual int getCellVertices() { return 65; }
+    virtual int getCellVertices();
 
 };
 
