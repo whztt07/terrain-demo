@@ -182,6 +182,8 @@ void Application::keyPressed(const SDL_KeyboardEvent &arg)
         mCamera->setPolygonMode(mCamera->getPolygonMode() == Ogre::PM_SOLID ? Ogre::PM_WIREFRAME : Ogre::PM_SOLID);
     if (arg.keysym.sym == SDLK_f)
         mFreeze = !mFreeze;
+    if (arg.keysym.sym == SDLK_ESCAPE)
+        mShutdown = true;
 }
 
 void Application::keyReleased(const SDL_KeyboardEvent &arg)
