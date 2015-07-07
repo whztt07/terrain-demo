@@ -152,10 +152,9 @@ bool Application::frameRenderingQueued(const Ogre::FrameEvent &evt)
 {
     mInputWrapper->capture(false);
 
-    Ogre::Timer timer;
     if (!mFreeze)
         mTerrain->update(mCamera->getRealPosition());
-    std::cout << "upd " << timer.getMilliseconds() << std::endl;
+
     // Camera movement
     Ogre::Vector3 movementVector (0,0,0);
     if (mInputWrapper->isKeyDown(SDL_GetScancodeFromKey(SDLK_w)))
