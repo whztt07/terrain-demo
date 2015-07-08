@@ -49,7 +49,8 @@ void TerrainStorage::getTriangleAt(const Ogre::Vector3& worldPos, Ogre::Plane& p
 
     int hmapSize = getHeightmapSize();
 
-    float factor = (float)hmapSize - 1.0f;
+    //float factor = (float)hmapSize - 1.0f;
+    float factor = hmapSize;
     float invFactor = 1.0f / factor;
 
     int startX = static_cast<int>(nX * factor);
