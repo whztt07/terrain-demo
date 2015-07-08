@@ -57,6 +57,7 @@ namespace Terrain
                            std::vector<LayerInfo>& layerList) = 0;
 
         virtual float getHeightAt (const Ogre::Vector3& worldPos) = 0;
+        virtual Ogre::Vector3 getNormalAt(const Ogre::Vector3& worldPos) = 0;
 
         virtual LayerInfo getDefaultLayer() = 0;
 

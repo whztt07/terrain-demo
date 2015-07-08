@@ -58,6 +58,8 @@ protected:
 
     virtual float getHeightAt (const Ogre::Vector3& worldPos);
 
+    virtual Ogre::Vector3 getNormalAt (const Ogre::Vector3& worldPos);
+
     virtual Terrain::LayerInfo getDefaultLayer();
 
     /// Get the transformation factor for mapping cell units to world units.
@@ -81,7 +83,13 @@ protected:
 private:
     void ensureHeightmapLoaded();
 
+    float getHeight(int x, int y);
+    Ogre::Vector3 getNormal(int x, int y);
+
+    void getTriangleAt(const Ogre::Vector3& worldPos, Ogre::Plane& plane, float& height);
+
     std::vector<float> mHeightmap;
+    int mHeightmapSize;
     float mMinHeight;
     float mMaxHeight;
 };

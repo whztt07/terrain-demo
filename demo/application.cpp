@@ -22,7 +22,7 @@ public:
     {
         for (int i=0; i<512; ++i)
             for (int j=0; j<512; ++j)
-                mHeightmap[i][j] = std::sin(j/50.f) * 200 + std::cos(i/50.f) * 100;
+                mHeightmap[i][j] = std::sin(j/50.f) * 600 + std::cos(i/50.f) * 100;
     }
 
     virtual int getHeightmapSize()
@@ -118,12 +118,17 @@ void Application::run()
     mInputWrapper->setMouseRelative(true);
 
     mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
-    mSceneMgr->setAmbientLight(Ogre::ColourValue(1,1,1,1));
+    mSceneMgr->setAmbientLight(Ogre::ColourValue(0.4, 0.4, 0.4));
     mCamera = mSceneMgr->createCamera("");
     mCamera->setNearClipDistance(0.1);
     mCamera->setFarClipDistance(10000);
     Ogre::Viewport* vp = mOgreWindow->addViewport(mCamera);
     vp->setBackgroundColour(Ogre::ColourValue(0.1,0.1,0.1,1.0));
+
+    Ogre::Light* light = mSceneMgr->createLight();
+    light->setType(Ogre::Light::LT_DIRECTIONAL);
+    light->setDirection(Ogre::Vector3(0.8, -1, 0.3));
+    light->setDiffuseColour(Ogre::ColourValue(1,1,1,1));
 
     Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(8);
     Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(8);
@@ -150,12 +155,17 @@ void Application::run()
         float x = (std::rand() / static_cast<float>(RAND_MAX) - 0.5) * storage->getWorldSize();
         float y = (std::rand() / static_cast<float>(RAND_MAX) - 0.5) * storage->getWorldSize();
 
-        float height = mTerrain->getHeightAt(Ogre::Vector3(x, y, 0));
+        float height = mTerrain->getHeightAt(Ogre::Vector3(x, 0, y));
+        Ogre::Vector3 normal = mTerrain->getNormalAt(Ogre::Vector3(x, 0, y));
+        normal.normalise();
 
-        Ogre::Entity* cubeEnt = mSceneMgr->createEntity(Ogre::SceneManager::PT_CUBE);
+        Ogre::Quaternion orient = Ogre::Vector3(0,0,1).getRotationTo(normal);
+
+        Ogre::Entity* cubeEnt = mSceneMgr->createEntity(Ogre::SceneManager::PT_PLANE);
         cubeEnt->setMaterialName("BaseWhite");
         Ogre::SceneNode* sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(x, height, y));
         sceneNode->setScale(Ogre::Vector3(0.01, 0.01, 0.01));
+        sceneNode->setOrientation(orient);
         sceneNode->attachObject(cubeEnt);
     }
 

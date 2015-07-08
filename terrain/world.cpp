@@ -194,6 +194,11 @@ namespace Terrain
         return mStorage->getHeightAt(worldPos);
     }
 
+    Ogre::Vector3 World::getNormalAt(const Ogre::Vector3 &worldPos)
+    {
+        return mStorage->getNormalAt(worldPos);
+    }
+
     void World::applyMaterials(bool shadows, bool splitShadows)
     {
         mShadows = shadows;

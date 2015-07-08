@@ -50,6 +50,7 @@ namespace Terrain
         bool getSplitShadowsEnabled() { return mSplitShadows; }
 
         float getHeightAt (const Ogre::Vector3& worldPos);
+        Ogre::Vector3 getNormalAt (const Ogre::Vector3& worldPos);
 
         /// Update chunk LODs according to this camera position
         /// @note Calling this method might lead to composite textures being rendered, so it is best
