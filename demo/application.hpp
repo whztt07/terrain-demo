@@ -46,6 +46,8 @@ protected:
 
     bool mShutdown;
 
+    float mTimerPrintFPS;
+
     bool mFreeze;
 
     Ogre::Root* mRoot;

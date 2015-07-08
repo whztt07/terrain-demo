@@ -55,6 +55,7 @@ Application::Application()
     , mSceneMgr(NULL)
     , mCamera(NULL)
     , mTerrain(NULL)
+    , mTimerPrintFPS(1.f)
     , mFreeze(false)
 {
 
@@ -90,9 +91,9 @@ void Application::run()
     mRoot->initialise(false);
 
     bool fullscreen=false;
-    int w = 1024;
-    int h = 768;
-    const std::string title = "Large Terrain Demo";
+    int w = 800;
+    int h = 600;
+    const std::string title = "Terrain Demo";
 
     mSDLWindow = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h,
                      SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
@@ -200,6 +201,13 @@ bool Application::frameRenderingQueued(const Ogre::FrameEvent &evt)
 
     if (!mFreeze)
         mTerrain->update(mCamera->getRealPosition());
+
+    mTimerPrintFPS -= evt.timeSinceLastFrame;
+    if (mTimerPrintFPS <= 0)
+    {
+        mTimerPrintFPS += 1;
+        std::cout << "FPS: " << mOgreWindow->getLastFPS() << std::endl;
+    }
 
     // Camera movement
     Ogre::Vector3 movementVector (0,0,0);
