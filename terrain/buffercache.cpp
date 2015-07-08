@@ -76,12 +76,12 @@ namespace Terrain
         {
             for (size_t col = colStart; col < colEnd; col += increment)
             {
-                indices.push_back(verts*col+row);
                 indices.push_back(verts*(col+increment)+row+increment);
+                indices.push_back(verts*col+row);
                 indices.push_back(verts*col+row+increment);
 
-                indices.push_back(verts*col+row);
                 indices.push_back(verts*(col+increment)+row);
+                indices.push_back(verts*col+row);
                 indices.push_back(verts*(col+increment)+row+increment);
             }
         }
@@ -97,8 +97,8 @@ namespace Terrain
             size_t outerStep = 1 << (lodDeltas[South] + lodLevel);
             for (size_t col = 0; col < verts-1; col += outerStep)
             {
-                indices.push_back(verts*col+row);
                 indices.push_back(verts*(col+outerStep)+row);
+                indices.push_back(verts*col+row);
                 // Make sure not to touch the right edge
                 if (col+outerStep == verts-1)
                     indices.push_back(verts*(col+outerStep-innerStep)+row+innerStep);
@@ -110,8 +110,8 @@ namespace Terrain
                     // Make sure not to touch the left or right edges
                     if (col+i == 0 || col+i == verts-1-innerStep)
                         continue;
-                    indices.push_back(verts*(col)+row);
                     indices.push_back(verts*(col+i+innerStep)+row+innerStep);
+                    indices.push_back(verts*(col)+row);
                     indices.push_back(verts*(col+i)+row+innerStep);
                 }
             }
@@ -121,8 +121,8 @@ namespace Terrain
             outerStep = 1 << (lodDeltas[North] + lodLevel);
             for (size_t col = 0; col < verts-1; col += outerStep)
             {
-                indices.push_back(verts*(col+outerStep)+row);
                 indices.push_back(verts*col+row);
+                indices.push_back(verts*(col+outerStep)+row);
                 // Make sure not to touch the left edge
                 if (col == 0)
                     indices.push_back(verts*(col+innerStep)+row-innerStep);
@@ -134,8 +134,8 @@ namespace Terrain
                     // Make sure not to touch the left or right edges
                     if (col+i == 0 || col+i == verts-1-innerStep)
                         continue;
-                    indices.push_back(verts*(col+i)+row-innerStep);
                     indices.push_back(verts*(col+i+innerStep)+row-innerStep);
+                    indices.push_back(verts*(col+i)+row-innerStep);
                     indices.push_back(verts*(col+outerStep)+row);
                 }
             }
@@ -145,8 +145,8 @@ namespace Terrain
             outerStep = 1 << (lodDeltas[West] + lodLevel);
             for (size_t row = 0; row < verts-1; row += outerStep)
             {
-                indices.push_back(verts*col+row+outerStep);
                 indices.push_back(verts*col+row);
+                indices.push_back(verts*col+row+outerStep);
                 // Make sure not to touch the top edge
                 if (row+outerStep == verts-1)
                     indices.push_back(verts*(col+innerStep)+row+outerStep-innerStep);
@@ -158,8 +158,8 @@ namespace Terrain
                     // Make sure not to touch the top or bottom edges
                     if (row+i == 0 || row+i == verts-1-innerStep)
                         continue;
-                    indices.push_back(verts*col+row);
                     indices.push_back(verts*(col+innerStep)+row+i);
+                    indices.push_back(verts*col+row);
                     indices.push_back(verts*(col+innerStep)+row+i+innerStep);
                 }
             }
@@ -169,8 +169,8 @@ namespace Terrain
             outerStep = 1 << (lodDeltas[East] + lodLevel);
             for (size_t row = 0; row < verts-1; row += outerStep)
             {
-                indices.push_back(verts*col+row);
                 indices.push_back(verts*col+row+outerStep);
+                indices.push_back(verts*col+row);
                 // Make sure not to touch the bottom edge
                 if (row == 0)
                     indices.push_back(verts*(col-innerStep)+row+innerStep);
@@ -182,8 +182,8 @@ namespace Terrain
                     // Make sure not to touch the top or bottom edges
                     if (row+i == 0 || row+i == verts-1-innerStep)
                         continue;
-                    indices.push_back(verts*col+row+outerStep);
                     indices.push_back(verts*(col-innerStep)+row+i+innerStep);
+                    indices.push_back(verts*col+row+outerStep);
                     indices.push_back(verts*(col-innerStep)+row+i);
                 }
             }

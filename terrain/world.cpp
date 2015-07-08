@@ -241,7 +241,7 @@ namespace Terrain
             convertPosition(bounds.getMinimum());
             convertPosition(bounds.getMaximum());
             // Because we changed sign of Z
-            std::swap(bounds.getMinimum().z, bounds.getMaximum().z);
+            //std::swap(bounds.getMinimum().z, bounds.getMaximum().z);
             return;
         case Align_YZ:
             convertPosition(bounds.getMinimum());

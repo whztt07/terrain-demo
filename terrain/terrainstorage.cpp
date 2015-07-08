@@ -41,7 +41,6 @@ void TerrainStorage::getTriangleAt(const Ogre::Vector3& worldPos, Ogre::Plane& p
 {
     float worldSize = getWorldSize();
     Ogre::Vector3 normalizedPos = worldPos / getWorldSize();
-    normalizedPos.z *= -1; // FIXME: ???
     normalizedPos += 0.5; // 0 .. 1
 
     float nX = normalizedPos.x;
@@ -105,7 +104,7 @@ Ogre::Vector3 TerrainStorage::getNormalAt(const Ogre::Vector3 &worldPos)
     Ogre::Plane plane;
     float height;
     getTriangleAt(worldPos, plane, height);
-    return Ogre::Vector3(plane.normal.x, plane.normal.z, -plane.normal.y);
+    return Ogre::Vector3(plane.normal.x, plane.normal.z, plane.normal.y);
 }
 
 void TerrainStorage::getBounds(float& minX, float& maxX, float& minY, float& maxY)
@@ -226,7 +225,7 @@ void TerrainStorage::fillVertexBuffers (int lodLevel, float size, const Ogre::Ve
 
             positions[x*numVerts*3 + y*3] = ((x/float(numVerts-1)-0.5) * size * getCellWorldSize());
             positions[x*numVerts*3 + y*3 + 1] = ((y/float(numVerts-1)-0.5) * size * getCellWorldSize());
-            positions[x*numVerts*3 + y*3 + 2] = mHeightmap[inY*heightmapSize + inX];
+            positions[x*numVerts*3 + y*3 + 2] = getHeight(inX, inY);
 
             // Adjust for wanted alignment
             convertPosition(align, positions[x*numVerts*3 + y*3], positions[x*numVerts*3 + y*3 + 1], positions[x*numVerts*3 + y*3 + 2]);

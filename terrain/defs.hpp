@@ -28,7 +28,7 @@ namespace Terrain
             std::swap(y, z);
             // This is since -Z should be going *into* the screen
             // If not doing this, we'd get wrong vertex winding
-            z *= -1;
+            //z *= -1;
             return;
         case Align_YZ:
             std::swap(x, y);

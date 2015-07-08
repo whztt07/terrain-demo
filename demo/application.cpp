@@ -22,7 +22,7 @@ public:
     {
         for (int i=0; i<512; ++i)
             for (int j=0; j<512; ++j)
-                mHeightmap[i][j] = std::sin(j/50.f) * 600 + std::cos(i/50.f) * 100;
+                mHeightmap[i][j] = std::sin(j/50.f) * 200 + std::cos(i/50.f) * 100;
     }
 
     virtual int getHeightmapSize()
