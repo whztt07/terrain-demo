@@ -163,8 +163,8 @@ void Application::run()
 
         Ogre::Entity* cubeEnt = mSceneMgr->createEntity(Ogre::SceneManager::PT_PLANE);
         cubeEnt->setMaterialName("BaseWhite");
-        Ogre::SceneNode* sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(x, height, y));
-        sceneNode->setScale(Ogre::Vector3(0.01, 0.01, 0.01));
+        Ogre::SceneNode* sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(x, height+0.1f, y));
+        sceneNode->setScale(Ogre::Vector3(0.05, 0.05, 0.05));
         sceneNode->setOrientation(orient);
         sceneNode->attachObject(cubeEnt);
     }
