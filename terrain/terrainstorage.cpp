@@ -100,6 +100,7 @@ float TerrainStorage::getHeightAt(const Ogre::Vector3 &worldPos)
     Ogre::Plane plane;
     float height;
     getTriangleAt(worldPos, plane, height);
+    return height;
 }
 
 Ogre::Vector3 TerrainStorage::getNormalAt(const Ogre::Vector3 &worldPos)
