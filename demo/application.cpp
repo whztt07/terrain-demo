@@ -179,6 +179,7 @@ void Application::run()
     factory->setGlobalSetting("shadows", "false");
     factory->setGlobalSetting("shadows_pssm", "false");
     factory->setGlobalSetting("num_lights", "1");
+    factory->setShaderDebugOutputEnabled(true);
 
     mCamera->setPosition(0,400,0);
 
