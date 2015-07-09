@@ -168,6 +168,8 @@ namespace Terrain
                 p->mShaderProperties.setProperty ("parallax_enabled", sh::makeProperty (new sh::BooleanValue(false)));
                 p->mShaderProperties.setProperty ("normal_maps",
                                                   sh::makeProperty (new sh::IntValue(0)));
+                p->mShaderProperties.setProperty ("blendmap_size",
+                                                  sh::makeProperty (new sh::IntValue(0)));
 
                 sh::MaterialInstanceTextureUnit* tex = p->createTextureUnit ("compositeMap");
                 tex->setProperty ("direct_texture", sh::makeProperty (new sh::StringValue(mCompositeMap)));
@@ -256,6 +258,8 @@ namespace Terrain
                     p->mShaderProperties.setProperty ("normal_map_enabled",
                                                       sh::makeProperty (new sh::BooleanValue(false)));
 
+                    int blendmap_size = 0;
+
                     // blend maps
                     // the index of the first blend map used in this pass
                     int blendmapStart;
@@ -268,7 +272,10 @@ namespace Terrain
                         sh::MaterialInstanceTextureUnit* blendTex = p->createTextureUnit ("blendMap" + Ogre::StringConverter::toString(i));
                         blendTex->setProperty ("direct_texture", sh::makeProperty (new sh::StringValue(mBlendmapList[blendmapStart+i]->getName())));
                         blendTex->setProperty ("tex_address_mode", sh::makeProperty (new sh::StringValue("clamp")));
+                        blendmap_size = mBlendmapList[blendmapStart+i]->getWidth();
                     }
+
+                    p->mShaderProperties.setProperty ("blendmap_size", sh::makeProperty(new sh::FloatValue(blendmap_size)));
 
                     // layer maps
                     bool anyNormalMaps = false;

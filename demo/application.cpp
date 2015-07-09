@@ -30,6 +30,11 @@ public:
         return 512;
     }
 
+    virtual int getBlendmapSize()
+    {
+        return 512;
+    }
+
     virtual int getWorldSize()
     {
         return getHeightmapSize() * 10;
@@ -40,6 +45,37 @@ public:
         memcpy(array, mHeightmap, 512*512*sizeof(float));
     }
 
+    virtual void loadBlendmap (std::vector<Terrain::LayerInfo>& layers, int* layerIndices)
+    {
+        const char* textures[] =
+        {
+            "adesert_cracks_d.jpg"
+            /*"adesert_mntn2_d.jpg",
+            "adesert_mntn4_d.jpg",
+            "adesert_mntn4v_d.jpg",
+            "adesert_mntn_d.jpg",
+            "adesert_rocky_d.jpg",
+            "adesert_sand2_d.jpg",
+            "adesert_stone_d.jpg"*/
+        };
+        int numtextures = sizeof(textures)/sizeof(textures[0]);
+
+        for (int i=0; i<numtextures; ++i)
+        {
+            Terrain::LayerInfo layerInfo;
+            layerInfo.mDiffuseMap = textures[i];
+            layers.push_back(layerInfo);
+        }
+
+        for (int x=0; x<getBlendmapSize(); ++x)
+        {
+            for (int y=0; y<getBlendmapSize(); ++y)
+            {
+                int layerIndex = std::rand() / (RAND_MAX+1.0) * numtextures;
+                layerIndices[y*getBlendmapSize() + x] = layerIndex;
+            }
+        }
+    }
 
 private:
     float mHeightmap[512][512];
@@ -206,7 +242,8 @@ bool Application::frameRenderingQueued(const Ogre::FrameEvent &evt)
     if (mTimerPrintFPS <= 0)
     {
         mTimerPrintFPS += 1;
-        std::cout << "FPS: " << mOgreWindow->getLastFPS() << std::endl;
+        std::cout << "FPS: " << mOgreWindow->getLastFPS() << " batches: "
+                  << mOgreWindow->getBatchCount() << " triangles: " << mOgreWindow->getTriangleCount() << std::endl;
     }
 
     // Camera movement

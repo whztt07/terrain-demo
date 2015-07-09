@@ -312,8 +312,6 @@ bool QuadTreeNode::update(const Ogre::Vector3 &cameraPos)
 
         if (mLoadState != LS_Loaded)
         {
-            loadLayers();
-
             LoadResponseData data;
             mTerrain->getStorage()->fillVertexBuffers(getNativeLodLevel(), getSize(), getCenter(), mTerrain->getAlign(),
                                             data.mPositions, data.mNormals, data.mColours);
@@ -391,6 +389,7 @@ void QuadTreeNode::load(const LoadResponseData &data)
 
     if (mSize == 1)
     {
+        loadLayers();
         mChunk->setMaterial(mMaterialGenerator->generate(mChunk->getMaterial()));
     }
     else
@@ -551,11 +550,6 @@ void QuadTreeNode::prepareForCompositeMap(Ogre::TRect<float> area)
         return;
     }
 
-    if (!mMaterialGenerator->hasLayers())
-    {
-        loadLayers();
-    }
-
     if (mSize > 1)
     {
         assert(hasChildren());
@@ -575,6 +569,11 @@ void QuadTreeNode::prepareForCompositeMap(Ogre::TRect<float> area)
     }
     else
     {
+        if (!mMaterialGenerator->hasLayers())
+        {
+            loadLayers();
+        }
+
         // TODO: when to destroy?
         Ogre::MaterialPtr material = mMaterialGenerator->generateForCompositeMapRTT(Ogre::MaterialPtr());
         makeQuad(sceneMgr, area.left, area.top, area.right, area.bottom, material);

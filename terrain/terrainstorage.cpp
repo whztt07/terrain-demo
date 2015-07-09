@@ -1,9 +1,9 @@
 #include "terrainstorage.hpp"
 
+#include <stdexcept>
+
 #include <OgreVector2.h>
 #include <OgreRoot.h>
-
-#include "Simplex.hpp"
 
 namespace Terrain
 {
@@ -12,6 +12,7 @@ TerrainStorage::TerrainStorage()
     : mMinHeight(std::numeric_limits<float>::max())
     , mMaxHeight(std::numeric_limits<float>::min())
     , mHeightmapSize(0)
+    , mBlendmapSize(0)
 {
 
 }
@@ -26,15 +27,17 @@ Terrain::LayerInfo TerrainStorage::getDefaultLayer()
     return info;
 }
 
+const int cellVerts = 33;
+
 float TerrainStorage::getCellWorldSize()
 {
-    // TODO
-    return 160;
+    int numcells = getHeightmapSize() / (getCellVertices()-1);
+    return getWorldSize() / numcells;
 }
 
 int TerrainStorage::getCellVertices()
 {
-    return 17;
+    return cellVerts;
 }
 
 void TerrainStorage::getTriangleAt(const Ogre::Vector3& worldPos, Ogre::Plane& plane, float& height)
@@ -148,12 +151,30 @@ void TerrainStorage::ensureHeightmapLoaded()
     }
 }
 
+void TerrainStorage::ensureBlendmapLoaded()
+{
+    if (mBlendmap.empty())
+    {
+        mBlendmapSize = getBlendmapSize();
+
+        mBlendmap.resize(mBlendmapSize*mBlendmapSize);
+        loadBlendmap(mLayers, &mBlendmap[0]);
+    }
+}
+
 float TerrainStorage::getHeight(int x, int y)
 {
     int hmapSize = getHeightmapSize();
     x = std::max(0, std::min(hmapSize-1, x));
     y = std::max(0, std::min(hmapSize-1, y));
     return mHeightmap[y*hmapSize + x];
+}
+
+int TerrainStorage::getLayerIndex(int x, int y)
+{
+    x = std::max(0, std::min(mBlendmapSize-1, x));
+    y = std::max(0, std::min(mBlendmapSize-1, y));
+    return mBlendmap[y*mBlendmapSize + x];
 }
 
 Ogre::Vector3 TerrainStorage::getNormal(int x, int y)
@@ -235,10 +256,6 @@ void TerrainStorage::fillVertexBuffers (int lodLevel, float size, const Ogre::Ve
             normals[x*numVerts*3 + y*3 + 1] = normal.y;
             normals[x*numVerts*3 + y*3 + 2] = normal.z;
 
-            float noise = SimplexNoise2D(startX + (x/float(numVerts-1)*size), startY + (y/float(numVerts-1)*size));
-            noise = 1 - ((1 - (noise+1)/2) * 0.6);
-            color = Ogre::ColourValue(noise,noise,noise,1);
-
             Ogre::uint32 rsColor;
             Ogre::Root::getSingleton().getRenderSystem()->convertColourValue(color, &rsColor);
             memcpy(&colours[x*numVerts*4 + y*4], &rsColor, sizeof(Ogre::uint32));
@@ -250,11 +267,92 @@ void TerrainStorage::getBlendmaps (float chunkSize, const Ogre::Vector2& chunkCe
                    std::vector<Ogre::PixelBox>& blendmaps,
                    std::vector<Terrain::LayerInfo>& layerList)
 {
-    Terrain::LayerInfo layer;
-    layer.mDiffuseMap = "lava.png";
-    layer.mParallax = false;
-    layer.mSpecular = false;
-    layerList.push_back(layer);
+    ensureBlendmapLoaded();
+
+    Ogre::Vector2 origin = chunkCenter - Ogre::Vector2(chunkSize/2.f, chunkSize/2.f);
+    int cellX = static_cast<int>(origin.x);
+    int cellY = static_cast<int>(origin.y);
+
+    if (chunkSize != 1)
+    {
+        std::cerr << "Unexpected chunk size " << chunkSize << " for blendmap " << std::endl;
+    }
+
+    // Blendmap size for this particular chunk
+    int numcells = getHeightmapSize() / (getCellVertices()-1);
+    int blendmapSize = mBlendmapSize / numcells * chunkSize;
+
+    blendmapSize += 1; // blendmapSize+1 to smoothly blend into the next cell
+
+    int blendmapStartX = cellX * mBlendmapSize / numcells + mBlendmapSize/2.f;
+    int blendmapStartY = cellY * mBlendmapSize / numcells + mBlendmapSize/2.f;
+
+    // Save the used texture indices so we know the total number of textures
+    // and number of required blend maps
+    std::set<int> layerIndices;
+
+    for (int y=0; y<blendmapSize; ++y)
+        for (int x=0; x<blendmapSize; ++x)
+        {
+            int layerIndex = getLayerIndex(blendmapStartX+x, blendmapStartY+y);
+            layerIndices.insert(layerIndex);
+        }
+
+    // Due to the way the blending works, the base layer will always shine through in between
+    // blend transitions (eg halfway between two texels, both blend values will be 0.5, so 25% of base layer visible).
+    // To get a consistent look, we need to make sure to use the same base layer in all cells.
+    // So we're always adding the base layer here, even if it's not referenced in this cell.
+
+    // Not needed if no blending at all is performed.
+    if (layerIndices.size() > 1)
+        layerIndices.insert(0);
+
+    // Makes sure the indices are sorted, or rather,
+    // retrieved as sorted. This is important to keep the splatting order
+    // consistent across cells.
+    for (std::set<int>::iterator it = layerIndices.begin(); it != layerIndices.end(); ++it)
+    {
+        if (*it >= mLayers.size())
+        {
+            std::stringstream errormsg;
+            errormsg << "Invalid layer '" << *it << "' referenced, only " << mLayers.size() << " layers are defined";
+            throw std::runtime_error(errormsg.str());
+        }
+        layerList.push_back(mLayers[*it]);
+    }
+
+    int numLayers = layerIndices.size();
+    // numLayers-1 since the base layer doesn't need blending
+    int numBlendmaps = pack ? static_cast<int>(std::ceil((numLayers - 1) / 4.f)) : (numLayers - 1);
+
+    int channels = pack ? 4 : 1;
+
+    // Second iteration - create and fill in the blend maps
+
+    for (int i=0; i<numBlendmaps; ++i)
+    {
+        Ogre::PixelFormat format = pack ? Ogre::PF_A8B8G8R8 : Ogre::PF_A8;
+
+        Ogre::uchar* pData =
+                        OGRE_ALLOC_T(Ogre::uchar, blendmapSize*blendmapSize*channels, Ogre::MEMCATEGORY_GENERAL);
+        memset(pData, 0, blendmapSize*blendmapSize*channels);
+
+        for (int y=0; y<blendmapSize; ++y)
+        {
+            for (int x=0; x<blendmapSize; ++x)
+            {
+                int layerIndex = getLayerIndex(blendmapStartX+x, blendmapStartY+y);
+                int blendIndex = (pack ? static_cast<int>(std::floor((layerIndex - 1) / 4.f)) : layerIndex - 1);
+                int channel = pack ? std::max(0, (layerIndex-1) % 4) : 0;
+
+                if (blendIndex == i)
+                    pData[y*blendmapSize*channels + x*channels + channel] = 255;
+                else
+                    pData[y*blendmapSize*channels + x*channels + channel] = 0;
+            }
+        }
+        blendmaps.push_back(Ogre::PixelBox(blendmapSize, blendmapSize, 1, format, pData));
+    }
 }
 
 }

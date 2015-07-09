@@ -1,6 +1,11 @@
 #ifndef COMPONENTS_TERRAIN_DEFS_HPP
 #define COMPONENTS_TERRAIN_DEFS_HPP
 
+#include <string>
+#include <vector>
+
+#include <OgrePixelFormat.h>
+
 namespace Terrain
 {
     class QuadTreeNode;
@@ -47,6 +52,12 @@ namespace Terrain
 
     struct LayerInfo
     {
+        LayerInfo()
+            : mParallax(false)
+            , mSpecular(false)
+        {
+        }
+
         std::string mDiffuseMap;
         std::string mNormalMap;
         bool mParallax; // Height info in normal map alpha channel?
@@ -55,7 +66,6 @@ namespace Terrain
 
     struct LayerCollection
     {
-        QuadTreeNode* mTarget;
         // Since we can't create a texture from a different thread, this only holds the raw texel data
         std::vector<Ogre::PixelBox> mBlendmaps;
         std::vector<LayerInfo> mLayers;

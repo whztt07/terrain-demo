@@ -17,6 +17,8 @@
 #define NEED_DEPTH 1
 #endif
 
+#define BLENDMAP_SIZE @shPropertyString(blendmap_size)
+
 #define RENDERCMP @shPropertyBool(render_composite_map)
 
 #define LIGHTING !RENDERCMP
@@ -243,7 +245,7 @@ float3 TSnormal = float3(0,0,1);
 // rescale UV to directly map edge vertices to texel centers - this is
 // important to get correct blending at cell transitions
 // TODO: parameterize texel size
-float2 blendUV = (UV - 0.5) * (16.0 / (16.0+1.0)) + 0.5;
+float2 blendUV = (UV - 0.5) * ((BLENDMAP_SIZE#.0) / (BLENDMAP_SIZE#.0)) + 0.5;
 @shForeach(@shPropertyString(num_blendmaps))
         float4 blendValues@shIterator = shSaturate(shSample(blendMap@shIterator, blendUV));
 @shEndForeach
@@ -251,6 +253,7 @@ float2 blendUV = (UV - 0.5) * (16.0 / (16.0+1.0)) + 0.5;
 
         float4 albedo = float4(0,0,0,1);
 
+        // TODO: parameterize layer texture size
         float2 layerUV = float2(UV.x, 1.f-UV.y) * 16; // Reverse Y, required to get proper tangents
         float2 thisLayerUV;
         float4 normalTex;

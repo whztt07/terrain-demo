@@ -5,7 +5,6 @@ set(SOURCE_FILES
     material.cpp
     storage.cpp
     terrainstorage.cpp
-    Simplex.cpp
     defs.hpp
     buffercache.cpp
 )

@@ -77,16 +77,29 @@ protected:
     /// Get the size of the whole terrain in world units.
     virtual int getWorldSize() = 0;
 
+    /// Get the size of the blendmap
+    virtual int getBlendmapSize() = 0;
+
     /// Fill the heightmap into an array of size heightmapSize * heightmapSize.
     virtual void loadHeightmap(float* array) = 0;
 
+    /// Fill the list of terrain layers, and then fill the blendmap into an array of size blendmapSize*blendmapSize.
+    /// Each value in the array is an index into the layer list.
+    virtual void loadBlendmap (std::vector<Terrain::LayerInfo>& layers, int* layerIndices) = 0;
+
 private:
     void ensureHeightmapLoaded();
+    void ensureBlendmapLoaded();
 
     float getHeight(int x, int y);
+    int getLayerIndex(int x, int y);
     Ogre::Vector3 getNormal(int x, int y);
 
     void getTriangleAt(const Ogre::Vector3& worldPos, Ogre::Plane& plane, float& height);
+
+    std::vector<int> mBlendmap;
+    int mBlendmapSize;
+    std::vector<Terrain::LayerInfo> mLayers;
 
     std::vector<float> mHeightmap;
     int mHeightmapSize;
