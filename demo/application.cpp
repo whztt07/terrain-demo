@@ -22,7 +22,7 @@ public:
     {
         for (int i=0; i<512; ++i)
             for (int j=0; j<512; ++j)
-                mHeightmap[i][j] = std::sin(j/50.f) * 200 + std::cos(i/50.f) * 100;
+                mHeightmap[i][j] = std::sin(j/50.f) * 400 + std::cos(i/50.f) * 200;
     }
 
     virtual int getHeightmapSize()
@@ -49,14 +49,14 @@ public:
     {
         const char* textures[] =
         {
-            "adesert_cracks_d.jpg"
-            /*"adesert_mntn2_d.jpg",
+            "adesert_cracks_d.jpg",
+            "adesert_mntn2_d.jpg",
             "adesert_mntn4_d.jpg",
             "adesert_mntn4v_d.jpg",
             "adesert_mntn_d.jpg",
             "adesert_rocky_d.jpg",
             "adesert_sand2_d.jpg",
-            "adesert_stone_d.jpg"*/
+            "adesert_stone_d.jpg"
         };
         int numtextures = sizeof(textures)/sizeof(textures[0]);
 
